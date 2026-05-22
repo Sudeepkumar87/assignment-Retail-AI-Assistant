@@ -4,16 +4,23 @@ import { loadOrders, loadProducts, loadPolicy } from '../loaders/loadData.js';
  * Evaluates return eligibility for a given order_id.
  * All decisions are based on data from CSVs and policy.txt — no hardcoding.
  */
+function normalizeOrderId(id) {
+  const digits = String(id).replace(/^[Oo]/, '').replace(/^0+/, '') || '0';
+  return 'O' + digits.padStart(4, '0');
+}
+
 export function evaluateReturn(order_id) {
   const orders = loadOrders();
   const products = loadProducts();
 
+  const normalizedId = normalizeOrderId(order_id);
+
   // Step 1: Find the order
-  const order = orders.find(o => o.order_id === order_id);
+  const order = orders.find(o => o.order_id === normalizedId);
   if (!order) {
     return {
       eligible: false,
-      reason: `Order ${order_id} not found. Cannot evaluate return.`,
+      reason: `Order ${normalizedId} not found. Cannot evaluate return.`,
     };
   }
 
